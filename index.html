@@ -521,7 +521,7 @@
         // ======================
         // CONFIG
         // ======================
-        const APPS_SCRIPT_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
+        const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzjSmfxXuWEfSd4ujEVdC2O0_ckj2HVuUFX-YS9tdHEcVxVBeTT1KuX4qUoI575gc58vw/exec';
         const FREE_LEVELS = 5;
         const FULL_LEVELS = 25;
 
@@ -770,9 +770,6 @@
         // API HELPER
         // ======================
         async function apiCall(action, data) {
-            if (APPS_SCRIPT_URL === 'PASTE_YOUR_APPS_SCRIPT_URL_HERE') {
-                return { success: false, error: 'Backend not configured. Contact admin.' };
-            }
             try {
                 const response = await fetch(APPS_SCRIPT_URL, {
                     method: 'POST',
@@ -788,7 +785,6 @@
         }
 
         async function apiGetLeaderboard() {
-            if (APPS_SCRIPT_URL === 'PASTE_YOUR_APPS_SCRIPT_URL_HERE') return { scores: [] };
             try {
                 const response = await fetch(`${APPS_SCRIPT_URL}?action=leaderboard`, { redirect: 'follow' });
                 return await response.json();
