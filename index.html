@@ -1,0 +1,1224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>AIYOLAH - LINGO ROAST!</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body {
+            background-color: #111827;
+            color: #ffffff;
+            touch-action: manipulation;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .pixel-text {
+            font-family: 'Press Start 2P', cursive;
+            text-transform: uppercase;
+            text-shadow: 2px 2px 0px #000;
+            line-height: 1.4;
+        }
+
+        .console-screen {
+            background-color: #0f172a;
+            border: 8px solid #374151;
+            border-bottom-color: #4b5563;
+            border-right-color: #4b5563;
+            border-radius: 12px;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8), 0 10px 15px -3px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .console-screen::after {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
+            border-radius: 4px;
+        }
+
+        .pad {
+            transition: transform 0.05s ease-out, filter 0.05s ease-out, box-shadow 0.05s ease-out;
+            box-shadow: 0 8px 0 rgba(0,0,0,0.6);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            font-weight: 800;
+            color: rgba(255, 255, 255, 0.9);
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.8);
+            padding: 10px;
+            text-align: center;
+            word-wrap: break-word;
+            line-height: 1.2;
+        }
+
+        .pad:active, .pad.active {
+            transform: translateY(8px);
+            box-shadow: 0 0px 0 rgba(0,0,0,0.6);
+            filter: brightness(1.3);
+        }
+
+        .pad-0 { background-color: #ef4444; }
+        .pad-1 { background-color: #eab308; }
+        .pad-2 { background-color: #22c55e; }
+        .pad-3 { background-color: #3b82f6; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            50% { transform: translateX(10px); }
+            75% { transform: translateX(-10px); }
+        }
+        .shake-animation { animation: shake 0.3s ease-in-out; }
+
+        .fade-in { animation: fadeIn 0.2s ease-in; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        @keyframes popInOut {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            15% { transform: translate(-50%, -50%) scale(1.2) rotate(-5deg); opacity: 1; }
+            85% { transform: translate(-50%, -50%) scale(1) rotate(0deg); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(1.5); opacity: 0; }
+        }
+        .animate-pop { animation: popInOut 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; }
+
+        .score-table th, .score-table td {
+            padding: 8px;
+            border-bottom: 1px solid #374151;
+        }
+
+        .star-rating svg {
+            cursor: pointer;
+            transition: color 0.2s, transform 0.2s;
+        }
+        .star-rating svg:hover, .star-rating svg.active {
+            color: #fbbf24;
+            transform: scale(1.2);
+        }
+
+        /* Auth form styles */
+        .auth-input {
+            background-color: #1f2937;
+            border: 2px solid #374151;
+            border-radius: 10px;
+            color: #ffffff;
+            padding: 14px 16px;
+            width: 100%;
+            font-size: 14px;
+            transition: border-color 0.2s;
+            -webkit-appearance: none;
+        }
+        .auth-input:focus {
+            outline: none;
+            border-color: #7c3aed;
+            background-color: #111827;
+        }
+        .auth-input::placeholder { color: #4b5563; }
+        .auth-error {
+            color: #f87171;
+            font-size: 11px;
+            margin-top: 6px;
+            text-align: center;
+            min-height: 18px;
+        }
+        .auth-link {
+            color: #a78bfa;
+            cursor: pointer;
+            text-decoration: underline;
+            font-size: 12px;
+        }
+        .auth-link:hover { color: #c4b5fd; }
+        .btn-primary {
+            background: linear-gradient(135deg, #7c3aed, #db2777);
+            color: white;
+            font-weight: 800;
+            padding: 14px 24px;
+            border-radius: 12px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+            font-size: 14px;
+            letter-spacing: 1px;
+            transition: opacity 0.2s, transform 0.1s;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.4);
+        }
+        .btn-primary:active { transform: translateY(4px); box-shadow: 0 0 0 rgba(0,0,0,0.4); }
+        .btn-primary:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-secondary {
+            background: #1f2937;
+            color: #d1d5db;
+            font-weight: 700;
+            padding: 12px 24px;
+            border-radius: 12px;
+            border: 2px solid #374151;
+            cursor: pointer;
+            width: 100%;
+            font-size: 13px;
+            transition: border-color 0.2s, transform 0.1s;
+            box-shadow: 0 4px 0 rgba(0,0,0,0.4);
+        }
+        .btn-secondary:active { transform: translateY(4px); box-shadow: 0 0 0 rgba(0,0,0,0.4); }
+        .divider {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #4b5563;
+            font-size: 12px;
+        }
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #374151;
+        }
+        .badge-free {
+            background: linear-gradient(135deg, #059669, #0d9488);
+            color: white;
+            font-size: 9px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+        .badge-full {
+            background: linear-gradient(135deg, #7c3aed, #db2777);
+            color: white;
+            font-size: 9px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        /* Spinner */
+        .spinner {
+            width: 18px; height: 18px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 8px;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="flex flex-col h-screen w-screen relative">
+
+    <!-- Top UI Bar -->
+    <div class="w-full bg-gray-900 py-3 px-4 flex items-center justify-between z-10 border-b-2 border-gray-800 relative">
+        <div class="flex items-center gap-2">
+            <div class="w-5 h-5 bg-white text-black font-black flex items-center justify-center text-xs rounded-sm">X</div>
+            <span class="text-white font-black tracking-widest text-xs uppercase hidden sm:inline-block">AIYOLAH</span>
+        </div>
+
+        <div class="flex-grow mx-4 h-4 bg-gray-800 rounded-sm overflow-hidden border border-gray-700 relative">
+            <div id="progressBar" class="h-full bg-gradient-to-r from-purple-500 to-pink-500 transition-all duration-300" style="width: 0%;"></div>
+            <div class="absolute left-[20%] top-0 bottom-0 w-[3px] bg-gray-900 z-10"></div>
+            <div class="absolute left-[40%] top-0 bottom-0 w-[3px] bg-gray-900 z-10"></div>
+            <div class="absolute left-[60%] top-0 bottom-0 w-[3px] bg-gray-900 z-10"></div>
+            <div class="absolute left-[80%] top-0 bottom-0 w-[3px] bg-gray-900 z-10"></div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <span id="levelCounterText" class="pixel-text text-[9px] text-gray-400">0/25</span>
+            <button onclick="toggleMute()" id="muteBtn" class="text-gray-400 hover:text-white transition-colors">
+                <svg id="soundIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd" />
+                </svg>
+            </button>
+            <!-- Auth status badge -->
+            <div id="authBadge" class="hidden items-center gap-1">
+                <div class="w-2 h-2 bg-green-400 rounded-full"></div>
+                <span id="authBadgeName" class="text-green-400 text-[9px] font-bold uppercase"></span>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN CONSOLE LAYOUT -->
+    <div class="flex-grow flex flex-col p-4 space-y-4 max-w-md mx-auto w-full h-full justify-center">
+        <div class="console-screen flex-none h-[45%] min-h-[220px] flex flex-col items-center p-4 text-center relative">
+            <div class="flex items-center justify-between w-full mb-2 opacity-60 text-[10px] font-bold uppercase tracking-widest text-blue-300">
+                <span id="qNum">Q1</span>
+                <span id="statusText">Awaiting Input...</span>
+            </div>
+
+            <div class="flex-grow flex items-center justify-center w-full px-2">
+                <h2 id="questionText" class="text-lg md:text-xl font-bold text-white drop-shadow-md leading-relaxed">
+                    Press start to begin the linguistic evaluation.
+                </h2>
+            </div>
+
+            <div class="w-full mt-auto pt-2">
+                <div class="w-full h-2 bg-gray-800 rounded-full overflow-hidden">
+                    <div id="timerBar" class="h-full bg-red-500" style="width: 100%;"></div>
+                </div>
+            </div>
+
+            <div id="popText" class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl md:text-4xl font-black text-yellow-300 drop-shadow-[0_5px_5px_rgba(0,0,0,1)] opacity-0 pointer-events-none z-20 whitespace-nowrap text-center pixel-text">
+                Wah...
+            </div>
+        </div>
+
+        <div id="gameBoard" class="flex-grow grid grid-cols-2 gap-3 w-full pb-2">
+            <button id="pad-0" class="pad pad-0 rounded-2xl" data-id="0">A</button>
+            <button id="pad-1" class="pad pad-1 rounded-2xl" data-id="1">B</button>
+            <button id="pad-2" class="pad pad-2 rounded-2xl" data-id="2">C</button>
+            <button id="pad-3" class="pad pad-3 rounded-2xl" data-id="3">D</button>
+        </div>
+    </div>
+
+    <!-- ========== OVERLAYS ========== -->
+
+    <!-- 1. GATE OVERLAY (splash screen) — Modified with auth options -->
+    <div id="gateOverlay" class="absolute inset-0 bg-gray-900 flex flex-col items-center justify-center z-[60] p-6">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-white text-black font-black flex items-center justify-center text-2xl rounded">X</div>
+            <span class="text-white font-black tracking-widest text-2xl uppercase">AIYOLAH</span>
+        </div>
+        <h1 class="text-3xl md:text-5xl pixel-text text-purple-400 mb-2 text-center drop-shadow-2xl">LINGO<br><span class="text-pink-500">ROAST!</span></h1>
+        <p class="text-gray-400 mb-8 pixel-text text-[9px] md:text-xs text-center leading-loose">MULTI-INTELLIGENCE<br>DIMENSION TEST</p>
+
+        <div class="w-full max-w-xs flex flex-col gap-3">
+            <!-- Register button (primary CTA) -->
+            <button onclick="showRegisterOverlay()" class="btn-primary pixel-text text-[11px] py-4">
+                CREATE ACCOUNT
+            </button>
+
+            <!-- Login button -->
+            <button onclick="showLoginOverlay()" class="btn-secondary pixel-text text-[11px] py-3">
+                LOG IN
+            </button>
+
+            <div class="divider mt-1 mb-1">or</div>
+
+            <!-- Free trial -->
+            <button onclick="enterFreeTrial()" class="flex items-center justify-center gap-2 text-gray-400 hover:text-white text-xs font-bold py-2 transition-colors">
+                <span class="badge-free">FREE</span>
+                <span>TRY 5 LEVELS (no signup)</span>
+            </button>
+        </div>
+
+        <!-- Perks comparison -->
+        <div class="mt-6 w-full max-w-xs bg-gray-800 rounded-xl p-4 border border-gray-700 text-xs text-gray-400 space-y-2">
+            <div class="flex justify-between items-center">
+                <span>🎮 Questions</span>
+                <div class="flex gap-2">
+                    <span class="badge-free">FREE: 5</span>
+                    <span class="badge-full">FULL: 25</span>
+                </div>
+            </div>
+            <div class="flex justify-between items-center">
+                <span>🏆 Global leaderboard</span>
+                <div class="flex gap-2">
+                    <span class="text-gray-600">✗</span>
+                    <span class="text-green-400">✓</span>
+                </div>
+            </div>
+            <div class="flex justify-between items-center">
+                <span>💾 Save your score</span>
+                <div class="flex gap-2">
+                    <span class="text-gray-600">✗</span>
+                    <span class="text-green-400">✓</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. LOGIN OVERLAY -->
+    <div id="loginOverlay" class="absolute inset-0 bg-gray-900 bg-opacity-98 flex flex-col items-center justify-center z-[62] p-6 hidden fade-in overflow-y-auto">
+        <div class="w-full max-w-xs">
+            <!-- Back button -->
+            <button onclick="showGateOverlay()" class="flex items-center gap-2 text-gray-500 hover:text-white text-xs mb-6 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                BACK
+            </button>
+
+            <div class="text-center mb-6">
+                <div class="text-4xl mb-3">🔑</div>
+                <h2 class="pixel-text text-purple-400 text-sm leading-relaxed">SIGN IN</h2>
+                <p class="text-gray-500 text-xs mt-2">Welcome back, dictionary don.</p>
+            </div>
+
+            <div class="space-y-3">
+                <input type="email" id="loginEmail" class="auth-input" placeholder="Email address" autocomplete="email" autocapitalize="none">
+                <input type="password" id="loginPassword" class="auth-input" placeholder="Password" autocomplete="current-password">
+                <div id="loginError" class="auth-error"></div>
+            </div>
+
+            <div class="mt-4 space-y-3">
+                <button onclick="handleLogin()" id="loginBtn" class="btn-primary pixel-text text-[11px] py-4">
+                    LOG IN
+                </button>
+                <div class="text-center text-xs text-gray-500 mt-2">
+                    No account? <span class="auth-link" onclick="showRegisterOverlay()">REGISTER HERE</span>
+                </div>
+                <div class="text-center mt-2">
+                    <span class="auth-link text-gray-600 text-[11px]" onclick="enterFreeTrial()">Just try 5 free levels</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 3. REGISTER OVERLAY -->
+    <div id="registerOverlay" class="absolute inset-0 bg-gray-900 bg-opacity-98 flex flex-col items-center justify-center z-[62] p-6 hidden fade-in overflow-y-auto">
+        <div class="w-full max-w-xs">
+            <!-- Back button -->
+            <button onclick="showGateOverlay()" class="flex items-center gap-2 text-gray-500 hover:text-white text-xs mb-6 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+                BACK
+            </button>
+
+            <div class="text-center mb-6">
+                <div class="text-4xl mb-3">🧠</div>
+                <h2 class="pixel-text text-pink-400 text-sm leading-relaxed">CREATE ACCOUNT</h2>
+                <p class="text-gray-500 text-xs mt-2">Unlock all 25 levels. Free, always.</p>
+            </div>
+
+            <div class="space-y-3">
+                <input type="email" id="registerEmail" class="auth-input" placeholder="Email address" autocomplete="email" autocapitalize="none">
+                <input type="text" id="registerName" class="auth-input" placeholder="Display name (max 10 chars)" autocomplete="off" maxlength="10" style="text-transform:uppercase">
+                <input type="password" id="registerPassword" class="auth-input" placeholder="Password (min 6 chars)" autocomplete="new-password">
+                <input type="password" id="registerConfirm" class="auth-input" placeholder="Confirm password" autocomplete="new-password">
+                <div id="registerError" class="auth-error"></div>
+            </div>
+
+            <div class="mt-4 space-y-3">
+                <button onclick="handleRegister()" id="registerBtn" class="btn-primary pixel-text text-[11px] py-4">
+                    REGISTER FREE
+                </button>
+                <div class="text-center text-xs text-gray-500 mt-2">
+                    Already have an account? <span class="auth-link" onclick="showLoginOverlay()">LOGIN</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4. START OVERLAY (free trial name entry) -->
+    <div id="startOverlay" class="absolute inset-0 bg-gray-900 bg-opacity-95 flex flex-col items-center justify-center z-50 p-6 text-center backdrop-blur-md hidden">
+        <span class="badge-free mb-4 text-[10px] py-2 px-4">FREE TRIAL · 5 LEVELS</span>
+        <h1 class="text-2xl md:text-3xl pixel-text text-purple-400 mb-4 text-center">WORDCELL<br><span class="text-pink-500">CHECK</span></h1>
+        <p class="text-gray-300 mb-6 max-w-sm text-sm md:text-lg leading-snug">
+            Are you a linguistic genius or do you speak entirely in TikTok sounds? 5 free questions. 10 seconds each. Let's go.
+        </p>
+
+        <input type="text" id="playerNameInput" placeholder="ENTER INITIALS" class="mb-4 px-6 py-4 rounded-xl bg-gray-800 text-white border-2 border-gray-600 focus:outline-none focus:border-purple-500 text-center text-xl w-full max-w-xs font-bold uppercase pixel-text text-sm" autocomplete="off" maxlength="10" style="user-select:text; -webkit-user-select:text;">
+
+        <button onclick="startFreeGame()" class="bg-pink-600 text-white font-bold py-4 px-8 rounded-xl text-xl shadow-lg transform transition active:scale-95 border-b-4 border-pink-800 pixel-text w-full max-w-xs text-sm mb-4">
+            START TEST
+        </button>
+
+        <div class="text-center">
+            <span class="text-gray-500 text-xs">Want all 25 levels? </span>
+            <span class="auth-link text-[12px]" onclick="showRegisterOverlay()">Register free →</span>
+        </div>
+    </div>
+
+    <!-- 5. FREE TRIAL END OVERLAY -->
+    <div id="freeTrialEndOverlay" class="absolute inset-0 bg-gray-900 bg-opacity-97 flex flex-col items-center justify-center z-[58] p-6 text-center hidden fade-in">
+        <div class="text-5xl mb-4">🔒</div>
+        <h2 class="pixel-text text-yellow-400 text-sm mb-3 leading-relaxed">FREE TRIAL<br>COMPLETE!</h2>
+        <p class="text-gray-300 text-sm mb-2">You scored <span id="freeScore" class="text-yellow-300 font-black text-xl pixel-text">0</span>/5 in the free tier.</p>
+        <p class="text-gray-500 text-xs mb-6 max-w-xs leading-relaxed">Register (free!) to unlock all 25 levels and compete on the global leaderboard.</p>
+
+        <div class="w-full max-w-xs space-y-3">
+            <button onclick="showRegisterOverlay()" class="btn-primary pixel-text text-[11px] py-4">
+                🚀 REGISTER FREE — UNLOCK ALL 25
+            </button>
+            <button onclick="showLoginOverlay()" class="btn-secondary pixel-text text-[10px] py-3">
+                ALREADY REGISTERED? LOG IN
+            </button>
+            <button onclick="retryFreeGame()" class="text-gray-600 hover:text-gray-400 text-xs py-2 transition-colors">
+                Retry free 5 levels
+            </button>
+        </div>
+    </div>
+
+    <!-- 6. MILESTONE OVERLAY -->
+    <div id="milestoneOverlay" class="absolute inset-0 bg-blue-900 bg-opacity-95 flex flex-col items-center justify-center z-[55] p-6 text-center backdrop-blur-md hidden fade-in">
+        <div class="text-6xl mb-4 animate-bounce">🧠</div>
+        <h2 class="text-xl md:text-2xl pixel-text text-yellow-400 mb-4 leading-relaxed">CORTEX<br>EXPANDING</h2>
+        <p id="milestoneText" class="text-lg md:text-xl text-white mb-8 max-w-sm font-medium">You actually know words? Shocking.</p>
+        <button onclick="continueFromMilestone()" class="bg-yellow-500 text-gray-900 font-black py-4 px-12 rounded-xl text-xl shadow-[0_0_20px_rgba(234,179,8,0.5)] transform transition active:scale-95 pixel-text text-sm">
+            CONTINUE
+        </button>
+    </div>
+
+    <!-- 7. GAME OVER OVERLAY -->
+    <div id="gameOverOverlay" class="absolute inset-0 bg-red-900 bg-opacity-95 flex flex-col items-center justify-center z-50 p-6 text-center backdrop-blur-md hidden fade-in overflow-y-auto">
+        <div class="text-6xl mb-2 mt-8">📉</div>
+        <h2 id="gameOverTitle" class="text-xl md:text-2xl pixel-text text-white mb-4 leading-relaxed">ILLITERATE AURA.</h2>
+        <p id="gameOverSub" class="text-gray-300 text-sm md:text-lg mb-4">You survived <span id="finalLevel" class="font-black text-yellow-300 text-2xl"></span> questions.</p>
+
+        <div class="flex gap-3 mb-6 w-full max-w-sm">
+            <button onclick="softReset()" class="flex-1 bg-gray-900 text-white font-bold py-3 px-4 rounded-xl text-xs shadow-lg transform transition active:scale-95 border-b-4 border-gray-950 pixel-text">
+                RETRY
+            </button>
+            <button onclick="showGateOverlay()" class="flex-1 bg-gray-800 text-gray-300 font-bold py-3 px-4 rounded-xl text-xs shadow-lg transform transition active:scale-95 border-b-4 border-gray-900 pixel-text">
+                HOME
+            </button>
+        </div>
+
+        <!-- Register CTA (shown only in free mode) -->
+        <div id="gameOverRegisterCTA" class="w-full max-w-sm mb-4 hidden">
+            <div class="bg-purple-900 bg-opacity-70 rounded-xl p-4 border border-purple-700">
+                <p class="text-purple-300 text-xs mb-3 pixel-text leading-loose">UNLOCK ALL 25 LEVELS<br>+ GLOBAL LEADERBOARD</p>
+                <button onclick="showRegisterOverlay()" class="btn-primary pixel-text text-[10px] py-3">
+                    REGISTER FREE →
+                </button>
+            </div>
+        </div>
+
+        <div class="w-full max-w-sm bg-gray-900 rounded-xl p-4 shadow-2xl border border-gray-700 mb-8">
+            <h3 class="text-purple-400 pixel-text text-[10px] mb-4 text-center leading-loose" id="leaderboardTitle">TOP 5<br>DICTIONARY DONS</h3>
+            <table class="w-full text-left text-sm score-table text-gray-300">
+                <thead>
+                    <tr class="text-gray-500 text-[10px] uppercase">
+                        <th>Subject</th>
+                        <th>Score</th>
+                    </tr>
+                </thead>
+                <tbody id="highScoreBody"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- 8. FEEDBACK OVERLAY (shown after all levels complete) -->
+    <div id="feedbackOverlay" class="absolute inset-0 bg-gray-900 bg-opacity-95 flex flex-col items-center justify-center z-[65] p-6 text-center backdrop-blur-md hidden fade-in">
+        <h2 class="text-2xl pixel-text text-green-400 mb-2">GAME COMPLETED</h2>
+        <p class="text-gray-300 text-sm mb-6">Bro actually beat the game. Valid. How was it?</p>
+
+        <div class="w-full max-w-sm bg-gray-800 rounded-xl p-6 shadow-2xl border border-gray-700">
+            <h3 class="text-white font-bold mb-3">Rate your experience</h3>
+            <div class="flex justify-center gap-2 mb-6 star-rating text-gray-500 text-3xl">
+                <svg onclick="rate(1)" class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                <svg onclick="rate(2)" class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                <svg onclick="rate(3)" class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                <svg onclick="rate(4)" class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                <svg onclick="rate(5)" class="w-8 h-8" fill="currentColor" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+            </div>
+
+            <textarea id="feedbackText" rows="3" placeholder="What should we add next?" class="w-full px-4 py-2 rounded bg-gray-900 text-white border border-gray-600 focus:outline-none focus:border-green-500 mb-4 text-sm" style="user-select:text;-webkit-user-select:text;"></textarea>
+
+            <button onclick="submitFeedback()" class="w-full bg-green-600 hover:bg-green-500 text-white font-bold py-3 rounded shadow-lg transform transition active:scale-95 text-sm uppercase">
+                Submit & See Score
+            </button>
+        </div>
+    </div>
+
+    <!-- ========== JAVASCRIPT ========== -->
+    <script>
+        // ======================
+        // CONFIG
+        // ======================
+        const APPS_SCRIPT_URL = 'PASTE_YOUR_APPS_SCRIPT_URL_HERE';
+        const FREE_LEVELS = 5;
+        const FULL_LEVELS = 25;
+
+        // ======================
+        // AUTH STATE
+        // ======================
+        let authState = {
+            isLoggedIn: false,
+            email: null,
+            displayName: null,
+            token: null
+        };
+        let gameMode = 'free'; // 'free' | 'full'
+
+        // ======================
+        // QUESTION BANK (25 questions)
+        // ======================
+        const questionBank = [
+            { q: "What does the slang 'Cap' mean?", options: ["A Hat", "A Lie", "A Limit", "Cool"], ans: 1 },
+            { q: "Choose the correct spelling:", options: ["Priviledge", "Privilege", "Privelige", "Privelidge"], ans: 1 },
+            { q: "What is a group of crows called?", options: ["A Murder", "A Parliament", "A Gaggle", "A Mob"], ans: 0 },
+            { q: "Which word means 'short-lived'?", options: ["Ethereal", "Ephemeral", "Eternal", "Endemic"], ans: 1 },
+            { q: "Which sentence is grammatically correct?", options: ["He did good.", "He did well.", "He done good.", "He done well."], ans: 1 },
+            { q: "What does 'Sus' originate from?", options: ["Suspend", "Sustain", "Suspicious", "Suspect"], ans: 2 },
+            { q: "A person who loves words is a:", options: ["Bibliophile", "Logophile", "Cynophile", "Astrophile"], ans: 1 },
+            { q: "Which is a synonym for 'Angry'?", options: ["Placid", "Irate", "Jovial", "Tepid"], ans: 1 },
+            { q: "What does 'Literally' actually mean?", options: ["Figuratively", "Very much", "Exactly as stated", "Sarcastically"], ans: 2 },
+            { q: "Identify the oxymoron:", options: ["Deafening silence", "Bright sun", "Loud noise", "Dark night"], ans: 0 },
+            { q: "What does 'TL;DR' stand for?", options: ["Too Long; Didn't Read", "To Last; Don't Read", "Text Long; Data Rare", "Time Lost; Dead Right"], ans: 0 },
+            { q: "Meaning of 'Schadenfreude'?", options: ["Fear of spiders", "Joy at others' pain", "Love for food", "Deep sadness"], ans: 1 },
+            { q: "Which is the correct usage?", options: ["Their going home.", "There going home.", "They're going home.", "They going home."], ans: 2 },
+            { q: "What does 'Bet' mean in Gen-Z slang?", options: ["Gamble", "No way", "Yes/Agreed", "I doubt it"], ans: 2 },
+            { q: "Opposite of 'Cacophony'?", options: ["Symphony", "Noise", "Euphony", "Silence"], ans: 2 },
+            { q: "If someone is 'Rizzed up', they are:", options: ["Robbed", "Charmed", "Beaten up", "Confused"], ans: 1 },
+            { q: "A 'Palindrome' is a word that:", options: ["Sounds like a noise", "Spells same backwards", "Has multiple meanings", "Is obsolete"], ans: 1 },
+            { q: "What is a 'Portmanteau'?", options: ["A type of ship", "A blended word (e.g., Brunch)", "A long poem", "A French greeting"], ans: 1 },
+            { q: "Which of these is a 'Malapropism'?", options: ["Dance a flamingo", "Bittersweet", "Jumbo shrimp", "Free gift"], ans: 0 },
+            { q: "If you have 'Brainrot', you:", options: ["Are highly intelligent", "Consume too much internet", "Have a disease", "Are sleepy"], ans: 1 },
+            { q: "What does SG slang 'Siao' mean?", options: ["Crazy", "Hungry", "Tired", "Happy"], ans: 0 },
+            { q: "What describes someone who is 'Kiasu'?", options: ["Brave", "Fear of losing out", "Lazy", "Talkative"], ans: 1 },
+            { q: "If a situation is 'Jialat', it is:", options: ["Awesome", "Spicy", "Disastrous/Terrible", "Boring"], ans: 2 },
+            { q: "What does 'Makan' mean?", options: ["To sleep", "To play", "To study", "To eat"], ans: 3 },
+            { q: "If food is 'Shiok', it is:", options: ["Too hot", "Fantastic/Delicious", "Spoiled", "Expensive"], ans: 1 }
+        ];
+
+        let activeQuestions = [];
+
+        const snarkyPops = ["EZ.", "W.", "Big Brain.", "Cooked him.", "No cap.", "Valid.", "Slay.", "Literally me.", "Based."];
+        const errorPops = ["L.", "Ratio.", "NPC.", "Mid.", "Brainrot.", "Illiterate."];
+        const milestoneRoasts = {
+            5: "5 questions. Kindergarten level intellect. Congrats.",
+            10: "10 questions. PSLE standard reached. Barely.",
+            15: "15 questions. Bro swallowed a dictionary.",
+            20: "20 questions. Actual scholar behavior.",
+            25: "25 questions. AIYOLAH you beat it!"
+        };
+
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let isWaitingForPlayer = false;
+        let playerName = "ANON";
+        let currentQuestionObj = null;
+        let timerInterval;
+
+        // DOM Elements
+        const pads = [
+            document.getElementById('pad-0'), document.getElementById('pad-1'),
+            document.getElementById('pad-2'), document.getElementById('pad-3')
+        ];
+        const statusText = document.getElementById('statusText');
+        const qNumText = document.getElementById('qNum');
+        const levelCounterText = document.getElementById('levelCounterText');
+        const questionText = document.getElementById('questionText');
+        const popText = document.getElementById('popText');
+        const progressBar = document.getElementById('progressBar');
+        const gameBoard = document.getElementById('gameBoard');
+        const timerBar = document.getElementById('timerBar');
+
+        // ======================
+        // AUDIO
+        // ======================
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+        let masterGain;
+        let isMuted = false;
+        let bgmPlaying = false;
+        let nextNoteTime = 0;
+        let currentNote = 0;
+        let bgmTimerID;
+
+        const melody = [
+            [659.25, 0.3], [493.88, 0.15], [523.25, 0.15], [587.33, 0.3], [523.25, 0.15], [493.88, 0.15],
+            [440.00, 0.3], [440.00, 0.15], [523.25, 0.15], [659.25, 0.3], [587.33, 0.15], [523.25, 0.15],
+            [493.88, 0.45], [523.25, 0.15], [587.33, 0.3], [659.25, 0.3],
+            [523.25, 0.3], [440.00, 0.3], [440.00, 0.3], [0, 0.3],
+            [587.33, 0.45], [698.46, 0.15], [880.00, 0.3], [783.99, 0.15], [698.46, 0.15],
+            [659.25, 0.45], [523.25, 0.15], [659.25, 0.3], [587.33, 0.15], [523.25, 0.15],
+            [493.88, 0.3], [493.88, 0.15], [523.25, 0.15], [587.33, 0.3], [659.25, 0.3],
+            [523.25, 0.3], [440.00, 0.3], [440.00, 0.3], [0, 0.3]
+        ];
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new AudioContext();
+                masterGain = audioCtx.createGain();
+                masterGain.connect(audioCtx.destination);
+                masterGain.gain.value = 0.3;
+            }
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function scheduleBGM() {
+            if (isMuted || !bgmPlaying) return;
+            while (nextNoteTime < audioCtx.currentTime + 0.1) {
+                let freq = melody[currentNote][0];
+                let dur = melody[currentNote][1];
+                if (freq > 0) {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.value = freq;
+                    gain.gain.setValueAtTime(0, nextNoteTime);
+                    gain.gain.linearRampToValueAtTime(0.2, nextNoteTime + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.001, nextNoteTime + dur - 0.01);
+                    osc.connect(gain); gain.connect(masterGain);
+                    osc.start(nextNoteTime); osc.stop(nextNoteTime + dur);
+                }
+                nextNoteTime += dur;
+                currentNote = (currentNote + 1) % melody.length;
+            }
+            bgmTimerID = setTimeout(scheduleBGM, 25);
+        }
+
+        function startBGM() {
+            if (!bgmPlaying) {
+                bgmPlaying = true;
+                nextNoteTime = audioCtx.currentTime + 0.1;
+                scheduleBGM();
+            }
+        }
+
+        function stopBGM() {
+            bgmPlaying = false;
+            clearTimeout(bgmTimerID);
+        }
+
+        function toggleMute() {
+            isMuted = !isMuted;
+            const icon = document.getElementById('soundIcon');
+            if (isMuted) {
+                masterGain.gain.value = 0;
+                icon.innerHTML = `<path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.368zm1.414-1.414L6.524 5.11a6 6 0 018.367 8.367zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd" />`;
+            } else {
+                masterGain.gain.value = 0.3;
+                icon.innerHTML = `<path fill-rule="evenodd" d="M9.383 3.076A1 1 0 0110 4v12a1 1 0 01-1.707.707L4.586 13H2a1 1 0 01-1-1V8a1 1 0 011-1h2.586l3.707-3.707a1 1 0 011.09-.217zM14.657 2.929a1 1 0 011.414 0A9.972 9.972 0 0119 10a9.972 9.972 0 01-2.929 7.071 1 1 0 01-1.414-1.414A7.971 7.971 0 0017 10c0-2.21-.894-4.208-2.343-5.657a1 1 0 010-1.414zm-2.829 2.828a1 1 0 011.415 0A5.983 5.983 0 0115 10a5.984 5.984 0 01-1.757 4.243 1 1 0 01-1.415-1.415A3.984 3.984 0 0013 10a3.983 3.983 0 00-1.172-2.828 1 1 0 010-1.415z" clip-rule="evenodd" />`;
+                startBGM();
+            }
+        }
+
+        function playTone(freq, duration = 0.1, type = 'square') {
+            if (!audioCtx || isMuted) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type; osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.3, audioCtx.currentTime + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+            osc.connect(gain); gain.connect(masterGain);
+            osc.start(); osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function playCorrectTone() {
+            if (!audioCtx || isMuted) return;
+            const now = audioCtx.currentTime;
+            [440, 554.37, 659.25].forEach((f, i) => {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sine'; osc.frequency.value = f;
+                gain.gain.setValueAtTime(0, now + (i * 0.08));
+                gain.gain.linearRampToValueAtTime(0.2, now + (i * 0.08) + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + (i * 0.08) + 0.3);
+                osc.connect(gain); gain.connect(masterGain);
+                osc.start(now + (i * 0.08)); osc.stop(now + (i * 0.08) + 0.4);
+            });
+        }
+
+        function playErrorTone() {
+            if (!audioCtx || isMuted) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(150, audioCtx.currentTime);
+            osc.frequency.exponentialRampToValueAtTime(50, audioCtx.currentTime + 0.5);
+            gain.gain.setValueAtTime(0, audioCtx.currentTime);
+            gain.gain.linearRampToValueAtTime(0.4, audioCtx.currentTime + 0.05);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.5);
+            osc.connect(gain); gain.connect(masterGain);
+            osc.start(); osc.stop(audioCtx.currentTime + 0.5);
+        }
+
+        // ======================
+        // AUTH OVERLAY NAVIGATION
+        // ======================
+        function hideAllOverlays() {
+            ['gateOverlay','loginOverlay','registerOverlay','startOverlay',
+             'freeTrialEndOverlay','milestoneOverlay','gameOverOverlay','feedbackOverlay'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+        }
+
+        function showGateOverlay() {
+            hideAllOverlays();
+            document.getElementById('gateOverlay').classList.remove('hidden');
+        }
+
+        function showLoginOverlay() {
+            initAudio();
+            playTone(880, 0.1, 'square');
+            hideAllOverlays();
+            document.getElementById('loginError').innerText = '';
+            document.getElementById('loginOverlay').classList.remove('hidden');
+        }
+
+        function showRegisterOverlay() {
+            initAudio();
+            playTone(880, 0.1, 'square');
+            hideAllOverlays();
+            document.getElementById('registerError').innerText = '';
+            document.getElementById('registerOverlay').classList.remove('hidden');
+        }
+
+        function enterFreeTrial() {
+            initAudio();
+            playTone(880, 0.2, 'square');
+            gameMode = 'free';
+            hideAllOverlays();
+            document.getElementById('startOverlay').classList.remove('hidden');
+        }
+
+        function retryFreeGame() {
+            hideAllOverlays();
+            document.getElementById('startOverlay').classList.remove('hidden');
+        }
+
+        // ======================
+        // API HELPER
+        // ======================
+        async function apiCall(action, data) {
+            if (APPS_SCRIPT_URL === 'PASTE_YOUR_APPS_SCRIPT_URL_HERE') {
+                return { success: false, error: 'Backend not configured. Contact admin.' };
+            }
+            try {
+                const response = await fetch(APPS_SCRIPT_URL, {
+                    method: 'POST',
+                    redirect: 'follow',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({ action, ...data })
+                });
+                return await response.json();
+            } catch (err) {
+                console.error('API Error:', err);
+                return { success: false, error: 'Network error. Please try again.' };
+            }
+        }
+
+        async function apiGetLeaderboard() {
+            if (APPS_SCRIPT_URL === 'PASTE_YOUR_APPS_SCRIPT_URL_HERE') return { scores: [] };
+            try {
+                const response = await fetch(`${APPS_SCRIPT_URL}?action=leaderboard`, { redirect: 'follow' });
+                return await response.json();
+            } catch (err) {
+                return { scores: [] };
+            }
+        }
+
+        // ======================
+        // AUTH HANDLERS
+        // ======================
+        async function handleLogin() {
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const password = document.getElementById('loginPassword').value;
+            const errorEl = document.getElementById('loginError');
+            const btn = document.getElementById('loginBtn');
+
+            if (!email || !password) {
+                errorEl.innerText = 'Please fill in all fields.'; return;
+            }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                errorEl.innerText = 'Please enter a valid email.'; return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>SIGNING IN...';
+            errorEl.innerText = '';
+
+            const result = await apiCall('login', { email, password });
+
+            btn.disabled = false;
+            btn.innerHTML = 'LOG IN';
+
+            if (result.success) {
+                authState = { isLoggedIn: true, email, displayName: result.displayName, token: result.token };
+                updateAuthBadge();
+                hideAllOverlays();
+                startFullGame(result.displayName);
+            } else {
+                errorEl.innerText = result.error || 'Login failed. Try again.';
+            }
+        }
+
+        async function handleRegister() {
+            const email = document.getElementById('registerEmail').value.trim().toLowerCase();
+            const name = document.getElementById('registerName').value.trim().toUpperCase();
+            const password = document.getElementById('registerPassword').value;
+            const confirm = document.getElementById('registerConfirm').value;
+            const errorEl = document.getElementById('registerError');
+            const btn = document.getElementById('registerBtn');
+
+            if (!email || !name || !password || !confirm) {
+                errorEl.innerText = 'Please fill in all fields.'; return;
+            }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                errorEl.innerText = 'Please enter a valid email.'; return;
+            }
+            if (name.length < 2) {
+                errorEl.innerText = 'Name must be at least 2 characters.'; return;
+            }
+            if (password.length < 6) {
+                errorEl.innerText = 'Password must be at least 6 characters.'; return;
+            }
+            if (password !== confirm) {
+                errorEl.innerText = 'Passwords do not match.'; return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner"></span>REGISTERING...';
+            errorEl.innerText = '';
+
+            const result = await apiCall('register', { email, displayName: name, password });
+
+            btn.disabled = false;
+            btn.innerHTML = 'REGISTER FREE';
+
+            if (result.success) {
+                authState = { isLoggedIn: true, email, displayName: result.displayName, token: result.token };
+                updateAuthBadge();
+                hideAllOverlays();
+                startFullGame(result.displayName);
+            } else {
+                errorEl.innerText = result.error || 'Registration failed. Try again.';
+            }
+        }
+
+        function updateAuthBadge() {
+            const badge = document.getElementById('authBadge');
+            const badgeName = document.getElementById('authBadgeName');
+            if (authState.isLoggedIn) {
+                badgeName.innerText = authState.displayName;
+                badge.classList.remove('hidden');
+                badge.classList.add('flex');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+
+        // ======================
+        // GAME START FUNCTIONS
+        // ======================
+        function startFreeGame() {
+            initAudio();
+            const inputName = document.getElementById('playerNameInput').value.trim();
+            playerName = inputName ? inputName.substring(0, 10).toUpperCase() : "ANON";
+            gameMode = 'free';
+            document.getElementById('startOverlay').classList.add('hidden');
+            activeQuestions = shuffle([...questionBank]).slice(0, FREE_LEVELS);
+            score = 0;
+            currentQuestionIndex = 0;
+            startBGM();
+            nextRound();
+        }
+
+        function startFullGame(displayName) {
+            initAudio();
+            playerName = displayName || authState.displayName || "PLAYER";
+            gameMode = 'full';
+            activeQuestions = shuffle([...questionBank]).slice(0, FULL_LEVELS);
+            score = 0;
+            currentQuestionIndex = 0;
+            startBGM();
+            nextRound();
+        }
+
+        function softReset() {
+            document.getElementById('gameOverOverlay').classList.add('hidden');
+            if (authState.isLoggedIn) {
+                startFullGame(authState.displayName);
+            } else {
+                document.getElementById('startOverlay').classList.remove('hidden');
+                document.getElementById('playerNameInput').value = playerName !== "ANON" ? playerName : "";
+            }
+        }
+
+        // ======================
+        // GAME LOGIC
+        // ======================
+        function shuffle(array) {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex > 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        }
+
+        function updateProgress() {
+            const total = activeQuestions.length;
+            const progress = (currentQuestionIndex / total) * 100;
+            progressBar.style.width = `${progress}%`;
+            levelCounterText.innerText = `${currentQuestionIndex}/${total}`;
+            qNumText.innerText = `Q${currentQuestionIndex + 1}`;
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timerBar.style.transition = 'none';
+            timerBar.style.width = '100%';
+
+            setTimeout(() => {
+                timerBar.style.transition = 'width 10s linear';
+                timerBar.style.width = '0%';
+            }, 50);
+
+            let timeLeft = 100;
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeOut();
+                }
+            }, 100);
+        }
+
+        function handleTimeOut() {
+            if (!isWaitingForPlayer) return;
+            isWaitingForPlayer = false;
+            playErrorTone();
+            showPopText("TOO SLOW", 'text-red-500');
+            gameOver("If you know, you know.<br>Try again bro.");
+        }
+
+        function nextRound() {
+            if (currentQuestionIndex >= activeQuestions.length) {
+                triggerMilestone();
+                return;
+            }
+
+            currentQuestionObj = activeQuestions[currentQuestionIndex];
+            updateProgress();
+
+            isWaitingForPlayer = false;
+            statusText.innerText = "Loading...";
+            statusText.classList.remove('text-green-400');
+            statusText.classList.add('text-yellow-400');
+            timerBar.style.transition = 'none';
+            timerBar.style.width = '100%';
+
+            questionText.innerText = "";
+            pads.forEach(pad => { pad.innerText = ""; pad.classList.remove('active'); });
+
+            questionText.innerText = currentQuestionObj.q;
+
+            setTimeout(() => {
+                pads.forEach((pad, index) => {
+                    pad.innerText = currentQuestionObj.options[index];
+                });
+                isWaitingForPlayer = true;
+                statusText.innerText = "Awaiting Input...";
+                statusText.classList.remove('text-yellow-400');
+                statusText.classList.add('text-green-400');
+                startTimer();
+            }, 300);
+        }
+
+        function showPopText(msg, colorClass = 'text-yellow-300') {
+            popText.innerText = msg;
+            popText.className = `absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-3xl md:text-4xl font-black drop-shadow-[0_5px_5px_rgba(0,0,0,1)] opacity-0 pointer-events-none z-20 whitespace-nowrap text-center pixel-text ${colorClass}`;
+            popText.classList.remove('animate-pop');
+            void popText.offsetWidth;
+            popText.classList.add('animate-pop');
+        }
+
+        function handlePadPress(id) {
+            if (!isWaitingForPlayer) return;
+            isWaitingForPlayer = false;
+            clearInterval(timerInterval);
+
+            const pad = pads[id];
+            pad.classList.add('active');
+
+            if (id === currentQuestionObj.ans) {
+                playCorrectTone();
+                score++;
+                currentQuestionIndex++;
+
+                showPopText(snarkyPops[Math.floor(Math.random() * snarkyPops.length)], 'text-green-400');
+                setTimeout(() => { pad.classList.remove('active'); }, 200);
+
+                // Free mode: hit limit → show trial end
+                if (gameMode === 'free' && currentQuestionIndex >= FREE_LEVELS) {
+                    setTimeout(() => showFreeTrialEnd(), 600);
+                    return;
+                }
+
+                // Check milestone (every 5 questions in full mode)
+                if (gameMode === 'full' && currentQuestionIndex > 0 && currentQuestionIndex % 5 === 0) {
+                    setTimeout(() => triggerMilestone(), 600);
+                } else {
+                    setTimeout(() => nextRound(), 600);
+                }
+            } else {
+                pad.style.backgroundColor = '#7f1d1d';
+                playErrorTone();
+                showPopText(errorPops[Math.floor(Math.random() * errorPops.length)], 'text-red-500');
+                gameOver("ILLITERATE AURA.");
+            }
+        }
+
+        // ======================
+        // FREE TRIAL END
+        // ======================
+        function showFreeTrialEnd() {
+            stopBGM();
+            document.getElementById('freeScore').innerText = score;
+            document.getElementById('freeTrialEndOverlay').classList.remove('hidden');
+            fireConfetti();
+        }
+
+        // ======================
+        // MILESTONES & CONFETTI
+        // ======================
+        function triggerMilestone() {
+            stopBGM();
+            const questionsDone = currentQuestionIndex;
+            let text = milestoneRoasts[questionsDone] || "You survived another phase.";
+            if (questionsDone >= activeQuestions.length) text = milestoneRoasts[25] || "AIYOLAH you beat it!";
+
+            document.getElementById('milestoneText').innerText = text;
+            document.getElementById('milestoneOverlay').classList.remove('hidden');
+            fireConfetti();
+        }
+
+        function continueFromMilestone() {
+            document.getElementById('milestoneOverlay').classList.add('hidden');
+            if (currentQuestionIndex >= activeQuestions.length) {
+                document.getElementById('feedbackOverlay').classList.remove('hidden');
+            } else {
+                startBGM();
+                setTimeout(() => nextRound(), 300);
+            }
+        }
+
+        function fireConfetti() {
+            confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 }, colors: ['#a855f7', '#ec4899', '#eab308', '#3b82f6'] });
+        }
+
+        // ======================
+        // FEEDBACK
+        // ======================
+        let selectedRating = 0;
+
+        function rate(stars) {
+            selectedRating = stars;
+            const svgs = document.querySelectorAll('.star-rating svg');
+            svgs.forEach((svg, index) => {
+                if (index < stars) svg.classList.add('text-yellow-400');
+                else svg.classList.remove('text-yellow-400');
+            });
+        }
+
+        async function submitFeedback() {
+            const feedbackTextVal = document.getElementById('feedbackText').value;
+            if (authState.isLoggedIn) {
+                await apiCall('saveFeedback', {
+                    email: authState.email,
+                    token: authState.token,
+                    rating: selectedRating,
+                    feedback: feedbackTextVal
+                });
+            }
+            document.getElementById('feedbackOverlay').classList.add('hidden');
+            gameOver("LEGEND STATUS ACQUIRED.");
+        }
+
+        // ======================
+        // GAME OVER
+        // ======================
+        function gameOver(titleText = "ILLITERATE AURA.") {
+            stopBGM();
+            isWaitingForPlayer = false;
+            clearInterval(timerInterval);
+
+            if (titleText !== "LEGEND STATUS ACQUIRED.") {
+                gameBoard.classList.add('shake-animation');
+            }
+            statusText.innerText = "CRITICAL FAILURE.";
+            statusText.classList.remove('text-green-400');
+            statusText.classList.add('text-red-500');
+
+            const leaderboardTitle = document.getElementById('leaderboardTitle');
+
+            setTimeout(async () => {
+                gameBoard.classList.remove('shake-animation');
+                pads.forEach(p => { p.style.backgroundColor = ''; p.classList.remove('active'); });
+
+                document.getElementById('gameOverTitle').innerHTML = titleText;
+                document.getElementById('finalLevel').innerText = score;
+
+                // Show register CTA for free mode
+                const cta = document.getElementById('gameOverRegisterCTA');
+                if (gameMode === 'free') {
+                    cta.classList.remove('hidden');
+                } else {
+                    cta.classList.add('hidden');
+                }
+
+                // Leaderboard
+                await saveAndRenderScores();
+
+                document.getElementById('gameOverOverlay').classList.remove('hidden');
+            }, 1000);
+        }
+
+        async function saveAndRenderScores() {
+            // Always save locally
+            let localScores = JSON.parse(localStorage.getItem('lingoRoastScores')) || [];
+            localScores.push({ name: playerName, score: score });
+            localScores.sort((a, b) => b.score - a.score);
+            localScores = localScores.slice(0, 5);
+            localStorage.setItem('lingoRoastScores', JSON.stringify(localScores));
+
+            if (authState.isLoggedIn) {
+                // Save to Google Sheets
+                await apiCall('saveScore', {
+                    email: authState.email,
+                    token: authState.token,
+                    score: score,
+                    displayName: playerName
+                });
+
+                // Try global leaderboard
+                const result = await apiGetLeaderboard();
+                if (result.scores && result.scores.length > 0) {
+                    document.getElementById('leaderboardTitle').innerHTML = 'GLOBAL TOP 10<br>DICTIONARY DONS';
+                    renderLeaderboard(result.scores);
+                    return;
+                }
+            }
+
+            document.getElementById('leaderboardTitle').innerHTML = 'TOP 5<br>DICTIONARY DONS';
+            renderLeaderboard(localScores.map(s => ({ displayName: s.name, score: s.score })));
+        }
+
+        function renderLeaderboard(scores) {
+            const tbody = document.getElementById('highScoreBody');
+            tbody.innerHTML = '';
+            scores.forEach((s, i) => {
+                const tr = document.createElement('tr');
+                const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`;
+                tr.innerHTML = `<td class="font-bold text-white uppercase">${medal} ${s.displayName || s.name}</td>
+                                <td class="text-pink-400 font-black pixel-text text-[10px] md:text-xs">${s.score} PTS</td>`;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ======================
+        // EVENT LISTENERS
+        // ======================
+        pads.forEach(pad => {
+            const id = parseInt(pad.getAttribute('data-id'));
+            pad.addEventListener('pointerdown', (e) => {
+                e.preventDefault();
+                handlePadPress(id);
+            });
+        });
+
+        document.body.addEventListener('touchmove', function (e) {
+            if (e.target.closest('#gameBoard')) e.preventDefault();
+        }, { passive: false });
+
+        // Allow Enter key to submit auth forms
+        document.getElementById('loginPassword').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleLogin();
+        });
+        document.getElementById('registerConfirm').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') handleRegister();
+        });
+    </script>
+</body>
+</html>
